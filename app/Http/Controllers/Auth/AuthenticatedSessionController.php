@@ -9,6 +9,9 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Gloudemans\Shoppingcart\Facades\Cart;
+use Illuminate\Support\Facades\Session;
+
 
 
 class AuthenticatedSessionController extends Controller
@@ -44,6 +47,8 @@ class AuthenticatedSessionController extends Controller
             return redirect()->route('vendor.dashboard')->with($notification);
         }
         elseif($request->user()->role === 'user'){
+
+           
               
             return redirect()->route('user.dashboard')->with($notification);
            // return redirect()->intended(RouteServiceProvider::HOME)->with($notification);

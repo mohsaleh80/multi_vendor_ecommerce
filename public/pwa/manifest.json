@@ -38,8 +38,8 @@
                       "sizes" : "512x512"
                   }
               ],
-    "start_url" : "./",
-    "id" : "./",
+    "start_url" : "/index.php",
+    "id" : "/index.php",
     "scope" : ".", 
     "display" : "standalone",
     "orientation" : "any",

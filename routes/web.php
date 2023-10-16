@@ -11,9 +11,12 @@ use App\Http\Controllers\Backend\ProductController;
 use App\Http\Controllers\Backend\VendorProductController;
 use App\Http\Controllers\Backend\SliderController;
 use App\Http\Controllers\Backend\BannerController;
+use App\Http\Controllers\Backend\CouponController;
 use App\Http\Controllers\Frontend\IndexController;
 use App\Http\Controllers\Frontend\CartController;
 use App\Http\Controllers\Frontend\WishlistController;
+use App\Http\Controllers\Frontend\CompareController;
+use App\Http\Controllers\Backend\ShippingAreaController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Middleware\RedirectIfAuthenticated;
@@ -241,6 +244,71 @@ Route::middleware(['auth','role:admin'])->group(function () {
 
 });
 
+//Coupon
+Route::middleware(['auth','role:admin'])->group(function () {    
+
+    Route::controller(CouponController::class)->group(function(){
+
+        Route::get('/coupon/all','AllCoupon')->name('coupon.all'); 
+        Route::get('/coupon/add','AddCoupon')->name('coupon.add'); 
+        Route::post('/coupon/store','StoreCoupon')->name('coupon.store');
+        Route::get('/edit/coupon/{id}' , 'EditCoupon')->name('edit.coupon');
+        Route::post('/update/coupon' , 'UpdateCoupon')->name('update.coupon');
+        Route::get('/delete/coupon/{id}' , 'DeleteCoupon')->name('delete.coupon');
+      
+    });
+
+});
+
+
+ // Shipping Region All Route 
+ Route::middleware(['auth','role:admin'])->group(function () {  
+
+    Route::controller(ShippingAreaController::class)->group(function(){
+        Route::get('/all/region' , 'AllRegion')->name('all.region');
+        Route::get('/add/region' , 'AddRegion')->name('add.region');
+        Route::post('/store/region' , 'StoreRegion')->name('store.region');
+        Route::get('/edit/region/{id}' , 'EditRegion')->name('edit.region');
+        Route::post('/update/region' , 'UpdateRegion')->name('update.region');
+        Route::get('/delete/region/{id}' , 'DeleteRegion')->name('delete.region');
+
+    }); 
+
+});
+
+
+// Shipping Devision All Route 
+Route::middleware(['auth','role:admin'])->group(function () {  
+
+    Route::controller(ShippingAreaController::class)->group(function(){
+        Route::get('/all/division' , 'AllDivision')->name('all.division');
+        Route::get('/add/division' , 'AddDivision')->name('add.division');
+        Route::post('/store/division' , 'StoreDivision')->name('store.division');
+        Route::get('/edit/division/{id}' , 'EditDivision')->name('edit.division');
+        Route::post('/update/division/{id}' , 'UpdateDivision')->name('update.division');
+        Route::get('/delete/division/{id}' , 'DeleteDivision')->name('delete.division');
+
+    }); 
+
+});
+
+
+// Shipping State All Route 
+Route::middleware(['auth','role:admin'])->group(function () {  
+
+    Route::controller(ShippingAreaController::class)->group(function(){
+        Route::get('/all/state' , 'AllState')->name('all.state');
+        Route::get('/add/state' , 'AddState')->name('add.state');
+        Route::post('/store/state' , 'StoreState')->name('store.state');
+        Route::get('/edit/state/{id}' , 'EditState')->name('edit.state');
+        Route::post('/update/state/{id}' , 'UpdateState')->name('update.state');
+        Route::get('/delete/state/{id}' , 'DeleteState')->name('delete.state');
+
+        Route::get('/division/ajax/{division_id}' , 'GetDivision');
+    }); 
+
+});
+
 
 //Frontend
 
@@ -294,6 +362,8 @@ Route::middleware(['auth','role:user'])->group(function () {
 
 /// Add to Wishlist 
 Route::post('/add-to-wishlist/{product_id}', [WishlistController::class, 'AddToWishList']);
+/// Add to Compare 
+Route::post('/add-to-compare/{product_id}', [CompareController::class, 'AddToCompare']);
 
 /// User All Route
 Route::middleware(['auth','role:user'])->group(function() {
@@ -304,12 +374,35 @@ Route::middleware(['auth','role:user'])->group(function() {
        Route::get('/wishlist' , 'AllWishlist')->name('wishlist'); 
        //Ajax in user dasgboard and frontend Dashboard
        Route::get('/get-wishlist-count' , 'getWishlistCount');
+       //After Remove get Products
        Route::get('/get-wishlist-product' , 'GetWishlistProduct');
        Route::get('/wishlist-remove/{id}' , 'WishlistRemove');
    
    }); 
+
+     // Comapre All Route 
+     Route::controller(CompareController::class)->group(function(){
+
+        Route::get('/compare' , 'AllCompareList')->name('compare'); 
+        //Ajax in user dasgboard and frontend Dashboard
+        Route::get('/get-compare-count' , 'getCompareCount');
+        Route::get('/get-compare-product' , 'GetCompareProduct');
+       Route::get('/compare-remove/{id}' , 'CompareRemove');
+    
+    }); 
+
+    // Cart All Route 
+    Route::controller(CartController::class)->group(function(){
+        Route::get('/mycart' , 'MyCart')->name('myCart');
+        Route::get('/get-cart-product' , 'GetCartProduct');
+        Route::get('/cart/product/remove/{rowId}', [CartController::class, 'RemoveCart']);
+        Route::get('/cart-decrement/{rowId}' , 'CartDecrement');
+        Route::get('/cart-increment/{rowId}' , 'CartIncrement');
+    });
    
 }); // end group middleware   
+
+
 
 
 

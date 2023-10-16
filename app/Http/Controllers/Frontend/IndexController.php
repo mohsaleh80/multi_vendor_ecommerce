@@ -203,7 +203,7 @@ public function CategoryProductSort($flag,$id){
         $products = Product::where('category_id',$id)->orderByRaw('CONVERT(selling_price, SIGNED) desc')->orderByRaw("CASE WHEN CONVERT(discount_price, SIGNED) IS NULL THEN CONVERT(selling_price, SIGNED) ELSE CONVERT(discount_price, SIGNED) END desc")->paginate(5);
 
     }elseif($flag == 2){
-        $products = Product::where('category_id',$id)->orderByRaw('CONVERT(selling_price, SIGNED) asc')->orderByRaw("CASE WHEN CONVERT(discount_price, SIGNED) IS NULL THEN CONVERT(selling_price, SIGNED) ELSE CONVERT(discount_price, SIGNED) asc")->paginate(5);
+        $products = Product::where('category_id',$id)->orderByRaw('CONVERT(selling_price, SIGNED) asc')->orderByRaw("CASE WHEN CONVERT(discount_price, SIGNED) IS NULL THEN CONVERT(selling_price, SIGNED) ELSE CONVERT(discount_price, SIGNED) END asc")->paginate(5);
         
     }elseif($flag == 3){
         $products = Product::where('category_id',$id)->OrderBy('created_at','DESC')->paginate(5);

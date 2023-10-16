@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8" />
-    <title>Bravo - MultiVendor eCommerce</title>
+    <title>MVE - MultiVendor eCommerce</title>
     <meta http-equiv="x-ua-compatible" content="ie=edge" />
     <meta name="description" content="" />
     <!-- Ajax CSRF -->
@@ -115,8 +115,11 @@
 
     <!-- Sweet Alert -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
     
+    <!-- PWA -->
+    <script src="{{ asset('pwa/js/registerSW.js') }}"></script>
+
+    <!-- End PWA -->
 
    <!-- Quick View Modal -->
     <script type="text/javascript">
@@ -470,6 +473,7 @@
     miniCart();
 </script>
 
+
 <script >
 
   function miniCartRemove(rowId){
@@ -483,6 +487,7 @@
 
                 //call miniCart
                 miniCart();
+                cart();
                 //display Sweet Alert Message
                 Swal.fire({     
                                 toast: true,
@@ -526,6 +531,249 @@
 
 </script>
 
+<!--  // Start Load MY Cart // -->
+<script type="text/javascript">
+    function cart(){
+   $.ajax({
+       type: 'GET',
+       url: '/get-cart-product',
+       dataType: 'json',
+       success:function(response){
+           // console.log(response)
+
+       var rows = ""
+       $.each(response.carts, function(key,value){
+          rows += `<tr class="pt-30">
+           <td class="custome-checkbox pl-30">
+                
+           </td>
+           <td class="image product-thumbnail pt-40"><img src="/${value.options.image} " alt="#"></td>
+           <td class="product-des product-name">
+               <h6 class="mb-5"><a class="product-name mb-10 text-heading" href="/product/details/${value.id}/${value.options.slug}">${value.name} </a></h6>
+               
+           </td>
+           <td class="price" data-title="Price">
+               <h4 class="text-body">$${value.price} </h4>
+           </td>
+             <td class="price" data-title="Price">
+             ${value.options.color == null
+               ? `<span>.... </span>`
+               : `<h6 class="text-body">${value.options.color} </h6>`
+             } 
+           </td>
+              <td class="price" data-title="Price">
+             ${value.options.size == null
+               ? `<span>.... </span>`
+               : `<h6 class="text-body">${value.options.size} </h6>`
+             } 
+           </td>
+           <td class="text-center detail-info" data-title="Stock">
+               <div class="detail-extralink mr-15">
+                   <div class="detail-qty border radius">
+                       <a type="submit" id="${value.rowId}" onclick="CartqtyDown(this.id)" class="qty-down"><i class="fi-rs-angle-small-down"></i></a>
+                      
+     <input type="text" name="quantity" class="qty-val" id="cart_qty_${value.rowId}" value="${value.qty}" min="1">
+                       <a type="submit" id="${value.rowId}" onclick="CartqtyUP(this.id)" class="qty-up"><i class="fi-rs-angle-small-up"></i></a>
+                   </div>
+               </div>
+           </td>
+           <td class="price" data-title="Price">
+               <h4 class="text-brand">$${value.subtotal} </h4>
+           </td>
+           <td class="action text-center" data-title="Remove"><a type="submit" onclick="CartRemove(this.id)" id="${value.rowId}" class="text-body"><i class="fi-rs-trash"></i></a></td>
+       </tr>`  
+         });
+           $('#cartPage').html(rows);
+       }
+   })
+}
+ cart();
+</script>
+<!--  // End Load MY Cart // -->
+<script >
+
+    function CartRemove(rowId){
+  
+         //alert(rowId);
+         $.ajax({
+          type: 'GET',
+          url: '/cart/product/remove/'+rowId,
+          dataType:'json',
+          success:function(response){
+  
+                  //call miniCart
+                  cart();
+                  miniCart();
+                  //display Sweet Alert Message
+                  Swal.fire({     
+                                  toast: true,
+                                  position: 'top-end',
+                                  icon: 'success',
+                                  title: response.success,
+                                  showConfirmButton: false,
+                                  timer: 4000,
+                                  showClass: {
+                                                  popup: 'animate__animated animate__fadeInDown'
+                                              },
+                                  hideClass: {
+                                                  popup: 'animate__animated animate__fadeOutUp'
+                                              }
+                              });
+              },
+           error: (error) => {
+                       
+                       Swal.fire({
+                                  toast: true,
+                                  position: 'top-end',
+                                  icon: 'error',
+                                  title: 'Product not removed!',
+                                  showConfirmButton: false,
+                                  timer: 4000,
+                                  showClass: {
+                                                  popup: 'animate__animated animate__fadeInDown'
+                                              },
+                                  hideClass: {
+                                                  popup: 'animate__animated animate__fadeOutUp'
+                                              }
+                                  });
+  
+  
+                            }//end error
+  
+  
+      }); //end ajax
+  
+    } // removeMiniCart
+  
+  </script>
+
+    
+<script>
+
+    function CartqtyUP($rowId){
+           
+           var qty = parseInt(document.getElementById("cart_qty_"+$rowId).value);
+           qty = qty+1;
+           document.getElementById("cart_qty_"+$rowId).value= qty;
+           cartIncrement($rowId);  
+            
+        }
+    
+        function CartqtyDown($rowId){          
+            
+           var qty = parseInt(document.getElementById("cart_qty_"+$rowId).value);
+           qty = qty - 1;
+           // min value = 1;
+           if(qty == 0){ qty = 1;}
+           document.getElementById("cart_qty_"+$rowId).value= qty;
+           cartDecrement($rowId);      
+        }
+
+
+        function cartDecrement($rowId){
+
+           
+            $.ajax({
+                type: 'GET',
+                url: "/cart-decrement/"+$rowId,
+                dataType: 'json',
+                success:function(response){
+                    
+                    cart();
+                    miniCart();
+                    
+                 //display Sweet Alert Message
+                 Swal.fire({     
+                                  toast: true,
+                                  position: 'top-end',
+                                  icon: 'success',
+                                  title: response.success,
+                                  showConfirmButton: false,
+                                  timer: 4000,
+                                  showClass: {
+                                                  popup: 'animate__animated animate__fadeInDown'
+                                              },
+                                  hideClass: {
+                                                  popup: 'animate__animated animate__fadeOutUp'
+                                              }
+                              });
+              },
+           error: (error) => {
+                       
+                       Swal.fire({
+                                  toast: true,
+                                  position: 'top-end',
+                                  icon: 'error',
+                                  title: 'QTY not updated!',
+                                  showConfirmButton: false,
+                                  timer: 4000,
+                                  showClass: {
+                                                  popup: 'animate__animated animate__fadeInDown'
+                                              },
+                                  hideClass: {
+                                                  popup: 'animate__animated animate__fadeOutUp'
+                                              }
+                                  });
+  
+  
+                            }//end error
+            });
+        }
+// Cart Decrement End 
+
+//Cart Increment
+
+function cartIncrement($rowId){
+
+           
+$.ajax({
+    type: 'GET',
+    url: "/cart-increment/"+$rowId,
+    dataType: 'json',
+    success:function(response){
+        
+        cart();
+        miniCart();
+        
+     //display Sweet Alert Message
+     Swal.fire({     
+                      toast: true,
+                      position: 'top-end',
+                      icon: 'success',
+                      title: response.success,
+                      showConfirmButton: false,
+                      timer: 4000,
+                      showClass: {
+                                      popup: 'animate__animated animate__fadeInDown'
+                                  },
+                      hideClass: {
+                                      popup: 'animate__animated animate__fadeOutUp'
+                                  }
+                  });
+  },
+error: (error) => {
+           
+           Swal.fire({
+                      toast: true,
+                      position: 'top-end',
+                      icon: 'error',
+                      title: 'QTY not updated!',
+                      showConfirmButton: false,
+                      timer: 4000,
+                      showClass: {
+                                      popup: 'animate__animated animate__fadeInDown'
+                                  },
+                      hideClass: {
+                                      popup: 'animate__animated animate__fadeOutUp'
+                                  }
+                      });
+
+
+                }//end error
+});
+}
+    </script>
+
 
 <!--  /// Start Wishlist Add -->
 <script type="text/javascript">
@@ -568,7 +816,7 @@
 </script>
 <!--  /// End Wishlist Add -->
 
-<!--  /// Start Load Wishlist Data -->
+<!--  /// get Whishlist Count Data -->
 <script type="text/javascript">
         
     function wishlistCount(){
@@ -702,18 +950,236 @@
     }
 </script>
 
+<!--  /// Start Compare Add -->
+<script type="text/javascript">
+        
+    function addToCompare(product_id){
+        $.ajax({
+            type: "POST",
+            dataType: 'json',
+            url: "/add-to-compare/"+product_id,
+            success:function(data){
+                   compareCount();
+                 // Start Message 
+        const Toast = Swal.mixin({
+              toast: true,
+              position: 'top-end',
+              
+              showConfirmButton: false,
+              timer: 3000 
+        })
+        if ($.isEmptyObject(data.error)) {
+                
+                Toast.fire({
+                type: 'success',
+                icon: 'success', 
+                title: data.success, 
+                })
+        }else{
+           
+       Toast.fire({
+                type: 'error',
+                icon: 'error', 
+                title: data.error, 
+                })
+            }
+          // End Message  
+            }
+        })
+    }
+</script> 
+<!--  /// End Compare Add -->
+
+<!--  /// get Compare Count Data -->
+<script type="text/javascript">
+        
+    function compareCount(){
+        $.ajax({
+            type: "GET",
+            dataType: 'json',
+            url: "/get-compare-count/",
+            success:function(response){
+
+                //alert(response.compareQty);
+                $('#userCompareCount').text(response.compareQty); 
+
+            }
+        })
+    }
+
+    compareCount();
+</script>
+
+<!--  /// Start Compare Remove -->
+<script type="text/javascript">
+        
+    function CompareRemove(id){
+       
+        //alert(id);
+        $.ajax({
+                type: "GET",
+                dataType: 'json',
+                url: "/compare-remove/"+id,
+                success:function(data){
+                compareAfterRemove();
+                compareCount();
+                     // Start Message 
+            const Toast = Swal.mixin({
+                  toast: true,
+                  position: 'top-end',
+                  
+                  showConfirmButton: false,
+                  timer: 3000 
+            })
+            if ($.isEmptyObject(data.error)) {
+                    
+                    Toast.fire({
+                    type: 'success',
+                    icon: 'success', 
+                    title: data.success, 
+                    })
+            }else{
+               
+           Toast.fire({
+                    type: 'error',
+                    icon: 'error', 
+                    title: data.error, 
+                    })
+                }
+              // End Message  
+                }
+            })
+        
+
+    }
+ // Compare Remove End
+    
+</script>
+
+
+<!--  /// Start Load Wishlist Data -->
+<script type="text/javascript">
+        
+    function compareAfterRemove(){
+        $.ajax({
+            type: "GET",
+            dataType: 'json',
+            url: "/get-compare-product/",
+            success:function(response){
+
+                var rows = `<tr class="pr_image">
+                                <td class="text-muted font-sm fw-600 font-heading mw-200" >Preview</td>`;         
+                   $.each(response.comparelist, function(key,value){
+                    rows += ` <td class="row_img"><img src="/${value.product.product_thambnail}" alt="compare-img" style="max-width: 200px;max-height:200px;"/></td>`;
+                    
+                   });
+
+                   rows +=`</tr>`; 
+                   rows += `<tr class="pr_title">
+                                <td class="text-muted font-sm fw-600 font-heading">Name</td>`;
+                   $.each(response.comparelist, function(key,value){
+                    rows += ` <td class="product_name">
+                                        <h6><a href="/product/details/${value.product.id}/${value.product.product_slug}" target="_blank" class="text-heading">${value.product.product_name}</a></h6>
+                                    </td>`;
+                    
+                   });
+
+                   rows +=`</tr>`;   
+                   rows += `<tr class="pr_price">
+                                <td class="text-muted font-sm fw-600 font-heading">Price</td>`; 
+                   $.each(response.comparelist, function(key,value){
+                    rows += `${value.product.discount_price == null
+                                ?           ` <td class="product_price">
+                                                <h4 class="price text-brand">${value.product.selling_price}</h4>
+                                            </td> `                                
+                            
+                                :            `<td class="product_price">
+                                                <h4 class="price text-brand">${value.product.discount_price}</h4>
+                                            </td>`
+                            }`;
+                    
+                   });
+
+                   rows +=`</tr>`;  
+                   rows += `<tr class="pr_rating">
+                                <td class="text-muted font-sm fw-600 font-heading">Rating</td>`;  
+                   $.each(response.comparelist, function(key,value){  
+                    rows +=`<td>
+                                    <div class="rating_wrap">
+                                        <div class="product-rate d-inline-block">
+                                            <div class="product-rating" style="width: 90%"></div>
+                                        </div>
+                                        <span class="rating_num">(121)</span>
+                                    </div>
+                                </td>`;
+                   });
+                   rows +=`</tr>`;   
+                   rows += `<tr class="description">
+                                <td class="text-muted font-sm fw-600 font-heading">Description</td>`;  
+                   $.each(response.comparelist, function(key,value){   
+                    rows += `<td class="row_text font-xs">
+                                        <p class="font-sm text-muted">${value.product.short_descp.substring(0, 100)}</p>
+                                    </td>`;
+                   });
+                   rows +=`</tr>`;
+                   rows += `<tr class="pr_stock">
+                                <td class="text-muted font-sm fw-600 font-heading">Stock status</td>`;  
+                   $.each(response.comparelist, function(key,value){ 
+                    rows += `${value.product.product_qty > 0
+                                ? `<td class="row_stock"><span class="stock-status in-stock mb-0">In Stock</span></td>`
+                                :`<td class="row_stock"><span class="stock-status out-stock mb-0">Out of stock</span></td>`
+                            }`
+                    });
+                   rows +=`</tr>`;
+                   rows += `<tr class="pr_add_to_cart">
+                              <td class="text-muted font-sm fw-600 font-heading">Buy now</td>`;  
+                   $.each(response.comparelist, function(key,value){ 
+
+                    rows += `${value.product.product_qty > 0
+                                ? `<td class="row_btn">
+                                        <button class="btn btn-sm"><i class="fi-rs-shopping-bag mr-5"></i>Add to cart</button>
+                                    </td>`
+                                :`<td class="row_btn">
+                                        <button class="btn btn-sm btn-secondary"><i class="fi-rs-headset mr-5"></i>Contact Us</button>
+                                    </td>`
+                            }`
+
+                    });
+                   rows +=`</tr>`;
+                   rows += `<tr class="pr_remove text-muted">
+                               <td class="text-muted font-md fw-600"></td>`;  
+                   $.each(response.comparelist, function(key,value){ 
+                    rows +=`<td class="row_remove">
+                                        <a type="submit" id="${value.id}" onclick="CompareRemove(this.id)" class="text-muted"><i class="fi-rs-trash mr-5"></i><span>Remove</span> </a>
+                            </td>`;
+                   });
+                   rows +=`</tr>`;
+
+       $('#compareProducts').html(rows);
+       $('#ajaxCompareCount').html(`There are ${response.compareQty} products in this list`);
+
+            }
+        })
+    }
+</script>
+
+
 
 </body>
 
 <!-- PWA -->
 <script>
-    if (window.matchMedia('(display-mode: standalone)').matches) { 
+    
+          if (window.matchMedia('(display-mode: standalone)').matches) { 
       // if webapp installed, remove 'target' attribute of links
       document.querySelectorAll('a[target=_blank]').forEach(function(a) {
          a.removeAttribute('target');
       });
     }
+    
+   
     </script>
     <!-- End PWA -->
+
 
 </html>

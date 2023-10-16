@@ -203,6 +203,14 @@
 	<script src="{{ asset('adminbackend/assets/js/app.js') }}"></script>
 	<!--Frontend Validation JS-->
 	<script src="{{ asset('adminbackend/assets/js/validate.min.js') }}"></script>
+
+
+    <!-- PWA -->
+    <script src="{{ asset('pwa/js/registerSW.js') }}"></script>
+
+    <!-- End PWA -->
+
+
     <!--Datatable JS-->
 	<script src="{{ asset('adminbackend/assets/plugins/datatable/js/jquery.dataTables.min.js') }}"></script>
 	<script src="{{ asset('adminbackend/assets/plugins/datatable/js/dataTables.bootstrap5.min.js') }}"></script>

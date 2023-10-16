@@ -2,7 +2,7 @@
 <html class="no-js" lang="en">
     <head>
         <meta charset="utf-8" />
-        <title>User Dashboard - MVE </title>
+        <title>MVE - User Dashboard</title>
         <meta http-equiv="x-ua-compatible" content="ie=edge" />
         <meta name="description" content="" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -86,6 +86,12 @@
    <!-- Template  JS -->
    <script src="{{ asset('frontend/assets/js/main.js?v=5.3') }}"></script>
    <script src="{{ asset('frontend/assets/js/shop.js?v=5.3') }}"></script>
+
+
+   <!-- PWA -->
+   <script src="{{ asset('pwa/js/registerSW.js') }}"></script>
+
+   <!-- End PWA -->
    
    <!-- Toaster -->
    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/toastr.min.js"></script>
@@ -110,7 +116,7 @@
  @endif 
 </script>
 
-!--  /// Start Load Wishlist Data -->
+<!--  /// Start Load Wishlist Data -->
 <script type="text/javascript">
         
     function wishlistCount(){
@@ -128,6 +134,26 @@
     }
 
     wishlistCount();
+</script>
+
+<!--  /// get Compare Count Data -->
+<script type="text/javascript">
+        
+    function compareCount(){
+        $.ajax({
+            type: "GET",
+            dataType: 'json',
+            url: "/get-compare-count/",
+            success:function(response){
+
+               // alert(response.wishQty);
+                $('#userCompareCount').text(response.compareQty); 
+
+            }
+        })
+    }
+
+    compareCount();
 </script>
 
 <!--  /// End Load Wishlist Count -->
@@ -172,6 +198,7 @@
     // call function
     miniCart();
 </script>
+
 
 <script >
 
@@ -229,17 +256,22 @@
 
 </script>
 
+
+
     </body>
 
-    <!-- PWA -->
-   <script>
+   <!-- PWA -->
+<script>
+    
     if (window.matchMedia('(display-mode: standalone)').matches) { 
-      // if webapp installed, remove 'target' attribute of links
-      document.querySelectorAll('a[target=_blank]').forEach(function(a) {
-         a.removeAttribute('target');
-      });
-    }
-    </script>
-    <!-- End PWA -->
+        // if webapp installed, remove 'target' attribute of links
+        document.querySelectorAll('a[target=_blank]').forEach(function(a) {
+        a.removeAttribute('target');
+        });
+        }
+
+
+</script>
+<!-- End PWA -->
 
     </html>    
